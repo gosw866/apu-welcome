@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>SECURE ACCESS</title>
+<style>
+body{
+  margin:0;
+  background:#000;
+  color:#00ff66;
+  font-family:monospace;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  height:100vh;
+  overflow:hidden;
+}
+#box{
+  text-align:center;
+  font-size:18px;
+  white-space:pre-line;
+}
+.warning{
+  color:#ff0033;
+  font-size:22px;
+  animation:shake .15s infinite;
+}
+.final{
+  font-size:36px;
+  color:#00ff66;
+  text-shadow:0 0 25px #00ff66;
+  animation:pulse 1s infinite alternate;
+}
+@keyframes shake{
+  0%{transform:translate(0)}
+  25%{transform:translate(5px)}
+  50%{transform:translate(-5px)}
+  75%{transform:translate(5px)}
+  100%{transform:translate(0)}
+}
+@keyframes pulse{
+  from{transform:scale(1)}
+  to{transform:scale(1.1)}
+}
+button{
+  background:black;
+  color:#00ff66;
+  border:1px solid #00ff66;
+  padding:12px 22px;
+  font-size:18px;
+  cursor:pointer;
+}
+</style>
+</head>
+
+<body>
+<div id="box">
+  <button onclick="start()">▶ INITIALIZE</button>
+</div>
+
+<audio id="type" src="https://www.soundjay.com/button/sounds/beep-09.mp3"></audio>
+<audio id="alarm" src="https://www.soundjay.com/misc/sounds/fail-buzzer-01.mp3"></audio>
+
+<script>
+const box=document.getElementById("box");
+const type=document.getElementById("type");
+const alarm=document.getElementById("alarm");
+
+function start(){
+  box.innerHTML="";
+  setTimeout(()=>{ run(); },2000); // fake hang
+}
+
+const lines=[
+  "Initializing secure connection...",
+  "Establishing encrypted tunnel...",
+  "Accessing device resources...",
+  "⚠ SECURITY BREACH DETECTED ⚠",
+  "Tracking device location...",
+  "Injecting payload..."
+];
+
+let i=0;
+function run(){
+  const t=setInterval(()=>{
+    type.currentTime=0;
+    type.play();
+    box.innerHTML+=lines[i]+"\n";
+    if(lines[i].includes("BREACH")){
+      box.className="warning";
+      alarm.play();
+    }
+    i++;
+    if(i===lines.length){
+      clearInterval(t);
+      setTimeout(finalScreen,1200);
+    }
+  },650);
+}
+
+function finalScreen(){
+  document.body.style.background="#000";
+  box.className="final";
+  box.innerHTML="\nAPU GOSWAMI\nWELCOMES YOU 😎";
+}
+</script>
+</body>
+</html>
