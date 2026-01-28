@@ -1,108 +1,147 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>SECURE ACCESS</title>
+<title>ACCESS GRANTED</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <style>
+*{margin:0;padding:0;box-sizing:border-box}
 body{
-  margin:0;
-  background:#000;
+  background:black;
   color:#00ff66;
   font-family:monospace;
-  display:flex;
-  align-items:center;
-  justify-content:center;
   height:100vh;
   overflow:hidden;
 }
+
+/* MATRIX */
+canvas{
+  position:fixed;
+  inset:0;
+  z-index:0;
+}
+
+/* CENTER BOX */
 #box{
+  position:relative;
+  z-index:2;
+  height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
   text-align:center;
-  font-size:18px;
   white-space:pre-line;
+  font-size:28px;
+  text-shadow:0 0 15px #00ff66;
 }
-.warning{
-  color:#ff0033;
-  font-size:22px;
-  animation:shake .15s infinite;
+
+/* FINAL TEXT */
+.big{
+  font-size:72px;
+  color:red;
+  text-shadow:0 0 30px red,0 0 90px red;
+  animation:shake .12s infinite;
 }
-.final{
-  font-size:36px;
-  color:#00ff66;
-  text-shadow:0 0 25px #00ff66;
-  animation:pulse 1s infinite alternate;
-}
+
+/* EFFECTS */
+.flash{animation:flash .08s infinite alternate}
+@keyframes flash{from{background:black}to{background:#300}}
+
 @keyframes shake{
   0%{transform:translate(0)}
-  25%{transform:translate(5px)}
-  50%{transform:translate(-5px)}
-  75%{transform:translate(5px)}
+  25%{transform:translate(5px,-5px)}
+  50%{transform:translate(-5px,5px)}
+  75%{transform:translate(5px,5px)}
   100%{transform:translate(0)}
-}
-@keyframes pulse{
-  from{transform:scale(1)}
-  to{transform:scale(1.1)}
-}
-button{
-  background:black;
-  color:#00ff66;
-  border:1px solid #00ff66;
-  padding:12px 22px;
-  font-size:18px;
-  cursor:pointer;
 }
 </style>
 </head>
 
-<body>
-<div id="box">
-  <button onclick="start()">▶ INITIALIZE</button>
-</div>
+<body onclick="startAttack()">
 
-<audio id="type" src="https://www.soundjay.com/button/sounds/beep-09.mp3"></audio>
-<audio id="alarm" src="https://www.soundjay.com/misc/sounds/fail-buzzer-01.mp3"></audio>
+<canvas id="matrix"></canvas>
+<div id="box">TAP TO INITIALIZE SYSTEM</div>
+
+<!-- SOUNDS -->
+<audio id="beep">
+  <source src="https://www.soundjay.com/button/sounds/beep-07.mp3">
+</audio>
+<audio id="siren" loop>
+  <source src="https://www.soundjay.com/misc/sounds/alarm-buzzer-1.mp3">
+</audio>
 
 <script>
-const box=document.getElementById("box");
-const type=document.getElementById("type");
-const alarm=document.getElementById("alarm");
-
-function start(){
-  box.innerHTML="";
-  setTimeout(()=>{ run(); },2000); // fake hang
+/* FULLSCREEN */
+function goFull(){
+  const d=document.documentElement;
+  if(d.requestFullscreen) d.requestFullscreen();
 }
 
+/* MATRIX */
+const c=document.getElementById("matrix");
+const ctx=c.getContext("2d");
+c.width=innerWidth; c.height=innerHeight;
+const chars="01APUGOSWAMI@#$%";
+const fs=16;
+const cols=c.width/fs;
+const drops=Array(cols).fill(1);
+
+function matrix(){
+  ctx.fillStyle="rgba(0,0,0,0.05)";
+  ctx.fillRect(0,0,c.width,c.height);
+  ctx.fillStyle="#0f0";
+  ctx.font=fs+"px monospace";
+  drops.forEach((y,i)=>{
+    const t=chars[Math.floor(Math.random()*chars.length)];
+    ctx.fillText(t,i*fs,y*fs);
+    if(y*fs>c.height && Math.random()>0.97) drops[i]=0;
+    drops[i]++;
+  });
+}
+
+/* TEXT SEQUENCE */
 const lines=[
-  "Initializing secure connection...",
-  "Establishing encrypted tunnel...",
-  "Accessing device resources...",
-  "⚠ SECURITY BREACH DETECTED ⚠",
-  "Tracking device location...",
-  "Injecting payload..."
+  "CONNECTING TO SERVER...",
+  "BYPASSING FIREWALL...",
+  "OVERRIDING SECURITY...",
+  "DEVICE ACCESS GRANTED ✔",
+  "",
+  "3",
+  "2",
+  "1",
+  "",
+  "APU GOSWAMI WELCOMES YOU 😎"
 ];
 
-let i=0;
-function run(){
+let i=0, started=false;
+
+function startAttack(){
+  if(started) return;
+  started=true;
+
+  goFull();
+  document.body.classList.add("flash");
+  document.getElementById("beep").play();
+  document.getElementById("siren").play();
+
+  if(navigator.vibrate){
+    navigator.vibrate([200,100,200,100,400]);
+  }
+
+  setInterval(matrix,33);
+
+  box.innerHTML="";
   const t=setInterval(()=>{
-    type.currentTime=0;
-    type.play();
     box.innerHTML+=lines[i]+"\n";
-    if(lines[i].includes("BREACH")){
-      box.className="warning";
-      alarm.play();
+    if(lines[i]==="APU GOSWAMI WELCOMES YOU 😎"){
+      box.className="big";
     }
     i++;
-    if(i===lines.length){
-      clearInterval(t);
-      setTimeout(finalScreen,1200);
-    }
+    if(i===lines.length) clearInterval(t);
   },650);
 }
-
-function finalScreen(){
-  document.body.style.background="#000";
-  box.className="final";
-  box.innerHTML="\nAPU GOSWAMI\nWELCOMES YOU 😎";
-}
 </script>
+
 </body>
 </html>
